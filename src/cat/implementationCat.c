@@ -2,7 +2,6 @@
 
 #include <errno.h>
 #include <getopt.h>
-#include <string.h>
 
 Flags CatReadFlags(int argc, char* argv[]) {
   struct option longOptions[] = {
@@ -14,11 +13,10 @@ Flags CatReadFlags(int argc, char* argv[]) {
   int currentFlag =
       getopt_long(argc, argv, "bevEnstT", longOptions,
                   NULL);  //передаем флаги которые хотим обработать
-  Flags flags = {false, false, false, false, false, false};
+  Flags flags = {false, false, false, false, false, false, false};
   for (; currentFlag != -1;
        currentFlag = getopt_long(argc, argv, "bevEnstT", longOptions, NULL)) {
     switch (currentFlag) {
-      break;
       case 'b':
         flags.numberNonBlank = true;
         break;
@@ -44,9 +42,9 @@ Flags CatReadFlags(int argc, char* argv[]) {
       } break;
       case 'T': {
         flags.tab = true;
-        flags.printNonPrintable = true;
-      }
-    }  //почему break работает с начала строки, как
+      } break;
+      default: flags.unknown = true;
+    }
   }
   return flags;
 }  //сократить фн
@@ -117,7 +115,7 @@ void CatSetNonPrintable(const char* table[static 256]) {
 }
 
 void CatFile(FILE* file, Flags flags,
-             const char* table[static 256]) {  //почему файл считается открытым
+             const char* table[static 256]) {  //почему файл считается открытым, проверить закрывается ли файл
   int c = 0;                                   //текущий символ
   int last = '\n';
   int count = 0;
@@ -128,7 +126,7 @@ void CatFile(FILE* file, Flags flags,
       if (flags.numberAll && !(flags.numberNonBlank))
         printf("%6d  ", ++count);  //нумерация всех строк
       if (flags.squeeze && c == '\n')
-        continue;  //возможно дело в винде, попробовать ко в кампусе
+        continue;  //пропуск пустой строки, возможно дело в винде, попробовать ко в кампусе
     }
     if(!*table[c])
         printf("\\0");

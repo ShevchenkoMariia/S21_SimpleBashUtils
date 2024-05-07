@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct {
   bool numberNonBlank;
@@ -11,6 +12,7 @@ typedef struct {
   bool squeeze;
   bool tab;
   bool printNonPrintable;
+  bool unknown;
 } Flags;
 
 Flags CatReadFlags(int argc, char* argv[]);

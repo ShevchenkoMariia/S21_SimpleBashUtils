@@ -2,7 +2,7 @@
 
 echo
 
-echo "Создание текстовых файлов для проверки: text1.txt и c наполнением, text3.txt - пустой."
+echo "Создание текстовых файлов для проверки: text1.txt c наполнением, text3.txt - пустой."
 touch text1.txt
 echo -e "Hello!
 My name - Kate. It is good?

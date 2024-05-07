@@ -2,7 +2,7 @@
 CFLAGS = -std=c11 -Werror -Wextra -Wall
 LDFLAGS =
 
-all: s21_cat s21_grep clean
+all: s21_cat clean
 
 s21_cat: cat.o implementationCat.o
 	$(CC) cat.o implementationCat.o -o s21_cat 
@@ -16,5 +16,5 @@ implementationCat.o: implementationCat.c implementationCat.h
 clean:
 	rm *.o
 
-s21_grep: grep.o
-	$(CC) grep.o -o s21_grep
+
+
