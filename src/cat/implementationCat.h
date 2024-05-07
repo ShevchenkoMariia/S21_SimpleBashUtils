@@ -1,8 +1,8 @@
 #ifndef MIMPLEMENTATION_CAT_H
 #define MIMPLEMENTATION_CAT_H
 
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 
 typedef struct {
@@ -21,7 +21,9 @@ void CatSetTable(const char* table[static 256]);
 void CatSetEndl(const char* table[static 256]);
 void CatSetNonPrintable(const char* table[static 256]);
 void CatTab(const char* table[static 256]);
-void CatFile(FILE* file, Flags flags, const char* table[static 256]); //возможно стоит поменять
-void Cat(int argc, char* argv[], Flags flags, const char* table[static 256]); //местами аргументы
+void CatFile(FILE* file, Flags flags,
+             const char* table[static 256]);  //возможно стоит поменять
+void Cat(int argc, char* argv[], Flags flags,
+         const char* table[static 256]);  //местами аргументы
 
 #endif

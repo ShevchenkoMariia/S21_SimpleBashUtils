@@ -43,7 +43,8 @@ Flags CatReadFlags(int argc, char* argv[]) {
       case 'T': {
         flags.tab = true;
       } break;
-      default: flags.unknown = true;
+      default:
+        flags.unknown = true;
     }
   }
   return flags;
@@ -115,8 +116,9 @@ void CatSetNonPrintable(const char* table[static 256]) {
 }
 
 void CatFile(FILE* file, Flags flags,
-             const char* table[static 256]) {  //почему файл считается открытым, проверить закрывается ли файл
-  int c = 0;                                   //текущий символ
+             const char* table[static 256]) {  //почему файл считается открытым,
+                                               //проверить закрывается ли файл
+  int c = 0;  //текущий символ
   int last = '\n';
   int count = 0;
   while (fread(&c, 1, 1, file) > 0) {
@@ -126,12 +128,13 @@ void CatFile(FILE* file, Flags flags,
       if (flags.numberAll && !(flags.numberNonBlank))
         printf("%6d  ", ++count);  //нумерация всех строк
       if (flags.squeeze && c == '\n')
-        continue;  //пропуск пустой строки, возможно дело в винде, попробовать ко в кампусе
+        continue;  //пропуск пустой строки, возможно дело в винде, попробовать
+                   //ко в кампусе
     }
-    if(!*table[c])
-        printf("\\0");
+    if (!*table[c])
+      printf("\\0");
     else
-    printf("%s", table[c]);
+      printf("%s", table[c]);
     last = c;
   }
 }
