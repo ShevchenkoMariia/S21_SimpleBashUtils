@@ -10,45 +10,23 @@ Flags CatReadFlags(int argc, char* argv[]) {
       {"squeeze-blank", 0, NULL, 's'},
       {NULL, 0, NULL, 0}  //таки образом показываем что массив закончился
   };
-  int currentFlag =
-      getopt_long(argc, argv, "bevEnstT", longOptions,
-                  NULL);  //передаем флаги которые хотим обработать
+  int currentFlag = 0;
   Flags flags = {false, false, false, false, false, false, false};
-  for (; currentFlag != -1;
-       currentFlag = getopt_long(argc, argv, "bevEnstT", longOptions, NULL)) {
-    switch (currentFlag) {
-      case 'b':
-        flags.numberNonBlank = true;
-        break;
-      case 'e': {
-        flags.markEndl = true;
-        flags.printNonPrintable = true;
-      } break;
-      case 'v':
-        flags.printNonPrintable = true;
-        break;
-      case 'E':
-        flags.markEndl = true;
-        break;
-      case 'n':
-        flags.numberAll = true;
-        break;
-      case 's':
-        flags.squeeze = true;
-        break;
-      case 't': {
-        flags.tab = true;
-        flags.printNonPrintable = true;
-      } break;
-      case 'T': {
-        flags.tab = true;
-      } break;
-      default:
-        flags.unknown = true;
-    }
+  while ((currentFlag =
+              getopt_long(argc, argv, "bevEnstT", longOptions, NULL)) != -1) {
+    if (currentFlag == 'b') flags.numberNonBlank = true;
+    if (currentFlag == 'e' || currentFlag == 'E') flags.markEndl = true;
+    if (currentFlag == 't' || currentFlag == 'T') flags.tab = true;
+    if (currentFlag == 'n') flags.numberAll = true;
+    if (currentFlag == 's') flags.squeeze = true;
+    if (currentFlag == 'e' || currentFlag == 't' || currentFlag == 'v')
+      flags.printNonPrintable = true;
+    if (!flags.numberNonBlank && !flags.markEndl && !flags.tab &&
+        !flags.numberAll && !flags.squeeze && !flags.printNonPrintable)
+      flags.unknown = true;
   }
   return flags;
-}  //сократить фн
+}
 
 void CatSetTable(const char* table[static 256]) {
   const char* rawTable[] = {
@@ -115,26 +93,22 @@ void CatSetNonPrintable(const char* table[static 256]) {
   memcpy(&table['~' + 1], sample3, sizeof sample3);
 }
 
-void CatFile(FILE* file, Flags flags,
-             const char* table[static 256]) {  //почему файл считается открытым,
-                                               //проверить закрывается ли файл
+void CatFile(FILE* file, Flags flags, const char* table[static 256]) {
   int c = 0;  //текущий символ
   int last = '\n';
   int count = 0;
+  int countS = 0;
+
   while (fread(&c, 1, 1, file) > 0) {
-    if (last == '\n') {
-      if (flags.numberNonBlank && c != '\n')
-        printf("%6d  ", ++count);  //нумерция не пустых строк
-      if (flags.numberAll && !(flags.numberNonBlank))
-        printf("%6d  ", ++count);  //нумерация всех строк
-      if (flags.squeeze && c == '\n')
-        continue;  //пропуск пустой строки, возможно дело в винде, попробовать
-                   //ко в кампусе
+    if (flags.numberAll && last == '\n') printf("%6d\t", ++count);
+    if (flags.numberNonBlank && last == '\n' && c != '\n')
+      printf("%6d\t", ++count);
+    if (flags.squeeze && last == '\n' && c == '\n') {
+      countS++;
+      if (countS > 1 && last == '\n' && c == '\n') continue;
     }
-    if (!*table[c])
-      printf("\\0");
-    else
-      printf("%s", table[c]);
+    if (countS > 1 && last == '\n' && c != '\n') countS = 0;
+    printf("%s", table[c]);
     last = c;
   }
 }
@@ -145,10 +119,10 @@ void Cat(int argc, char* argv[], Flags flags,
        ++filename) {
     if (**filename == '-') continue;
     FILE* file = fopen(*filename, "rb");
-    if (errno) {  //Если файл открыть не удалось (т.е. переменная `errno` не
-                  //равна нулю), то функция выводит сообщение об ошибке на
-                  //стандартный вывод об ошибке и продолжает работу с очередным
-                  //аргументом.
+    if (errno) { /*Если файл открыть не удалось (т.е. переменная `errno` не
+                 равна нулю), то функция выводит сообщение об ошибке на
+                 стандартный вывод об ошибке и продолжает работу с очередным
+                 аргументом.*/
       fprintf(stderr, "%s: ", argv[0]);
       perror(*filename);
       // printf("Error: %s\n", strerror(errno));
