@@ -1,6 +1,7 @@
 #ifndef GREP_FN
 #define GREP_FN
 
+#include <regex.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -22,5 +23,7 @@ int SearchPattern(int argc, char* argv[]);
 void PriorityOfFlags(Flags* flags);
 void SearchFlags(int argc, char* argv[], Flags* flags);
 void ValidationCheckFile(int argc, char* argv[], Flags flags);
+void UsingTheFlagO(Flags* flags, regex_t* regex, char* line, int countStr,
+                   int countFile, char* filename);
 
 #endif

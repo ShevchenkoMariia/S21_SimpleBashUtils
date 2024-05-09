@@ -1,7 +1,6 @@
 #include "grepFn.h"
 
 #include <getopt.h>
-#include <regex.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,6 +16,8 @@ void OutputToTheLine(Flags* flags, char* filename, int countFile, int countStr,
 void UsingTheFlagV(Flags* flags, char* filename, int countFile, int countStr,
                    char* line);
 void OutputWhiteText(Flags* flags, char* line, int countFile, int i);
+void PrintingMatches(Flags* flags, regmatch_t match[], char* line,
+                     int countFile);
 
 void SearchFlags(int argc, char* argv[], Flags* flags) {
   int currentFlag = 0;
@@ -186,20 +187,16 @@ void MatchSearch(int argc, char* argv[], FILE* file, Flags flags,
   int countL = 0;
   while ((read = getline(&line, &len, file)) != -1) {
     countStr++;
+    if (flags.O && !flags.C && !flags.L && !flags.V) {
+      UsingTheFlagO(&flags, regex, line, countStr, countFile, filename);
+      continue;
+    }
     line[strcspn(line, "\n")] = 0;
     int errorRegexec = 0;
     if ((errorRegexec = regexec(regex, line, patternLenght, match, 0)) == 0) {
       countMatch++;
       OutputToTheLine(&flags, filename, countFile, countStr, &countL);
-      for (int i = 0; i < (int)strlen(line); i++) {
-        if (i >= match[0].rm_so && i < match[0].rm_eo) {
-          if (!flags.L && !flags.V && !flags.C) printf("%c", line[i]);
-          if (i == (int)strlen(line) - 1 && !flags.C && !flags.V && !flags.L)
-            printf("\n");
-          continue;
-        }
-        OutputWhiteText(&flags, line, countFile, i);
-      }
+      if (!flags.O) PrintingMatches(&flags, match, line, countFile);
     } else if (errorRegexec > 1) {
       fprintf(stderr, "%s: error in the regexec function\n", argv[0]);
     } else if (errorRegexec == REG_NOMATCH && flags.V && !flags.O) {
@@ -210,6 +207,35 @@ void MatchSearch(int argc, char* argv[], FILE* file, Flags flags,
   UsingTheFlagC(&flags, filename, countFile, countMatch, countNoMatch);
   free(line);
   regfree(regex);
+}
+
+void PrintingMatches(Flags* flags, regmatch_t match[], char* line,
+                     int countFile) {
+  for (int i = 0; i < (int)strlen(line); i++) {
+    if (i >= match[0].rm_so && i < match[0].rm_eo) {
+      if (!flags->L && !flags->V && !flags->C) printf("%c", line[i]);
+      if (i == (int)strlen(line) - 1 && !flags->C && !flags->V && !flags->L)
+        printf("\n");
+      continue;
+    }
+    OutputWhiteText(flags, line, countFile, i);
+  }
+}
+
+void UsingTheFlagO(Flags* flags, regex_t* regex, char* line, int countStr,
+                   int countFile, char* filename) {
+  int newStart = 0;
+  regmatch_t match;
+  int matchRes = 0;
+  while ((matchRes = regexec(regex, line + newStart, 1, &match, 0)) == 0) {
+    for (int i = match.rm_so; i < match.rm_eo; i++) {
+      if (countFile > 1 && !flags->H) printf("%s:", filename);
+      if (flags->N) printf("%d:", countStr);
+      printf("%c", line[i + newStart]);
+    }
+    printf("\n");
+    newStart += match.rm_eo;
+  }
 }
 
 //вывод чистого текста
