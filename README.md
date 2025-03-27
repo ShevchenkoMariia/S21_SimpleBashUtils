@@ -2,15 +2,24 @@
 
 Development of Bash text utilities: cat, grep.
 
+The experience gained as a result of the project:
+- compliance with C11 standards and principles of structured programming;
+- experience in developing command-line utilities in C;
+- working with text files (reading, processing and outputting text data);
+- working with regular expressions to search and filter data;
+- understanding of working with the command line and interacting with the file system;
+- build a project using a Makefile, including targets for compilation and testing;
+- development of integration tests to verify the correctness of the utilities, comparing them with the behavior of the original Bash utilities.
+
 The russian version of the task can be found in the repository.
 
 ## Contents
 
-1. [Chapter I](#chapter-i)   
+1. [Chapter I](#chapter-i)  
    1.1. [Introduction](#introduction)
-2. [Chapter II](#chapter-ii)   
+2. [Chapter II](#chapter-ii)  
    2.1. [Information](#information)
-3. [Chapter III](#chapter-iii)   
+3. [Chapter III](#chapter-iii)  
    3.1. [Part 1](#part-1-working-with-the-cat-utility)  
    3.2. [Part 2](#part-2-working-with-grep-utility)  
    3.3. [Part 3](#part-3-bonus-implementation-of-some-grep-utility-flags)  
